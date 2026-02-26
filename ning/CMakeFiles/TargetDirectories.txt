@@ -1,0 +1,3 @@
+/home/ning/CC/ning/CMakeFiles/enemy_demo.dir
+/home/ning/CC/ning/CMakeFiles/edit_cache.dir
+/home/ning/CC/ning/CMakeFiles/rebuild_cache.dir
