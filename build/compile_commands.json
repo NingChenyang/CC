@@ -1,0 +1,52 @@
+[
+{
+  "directory": "/home/ning/CC/build",
+  "command": "/usr/bin/clang++ -I/home/ning/CC/ning -g -Wall -Wextra -Wpedantic -std=gnu++11 -o CMakeFiles/enemy_demo.dir/enemy.cpp.o -c /home/ning/CC/ning/enemy.cpp",
+  "file": "/home/ning/CC/ning/enemy.cpp"
+},
+{
+  "directory": "/home/ning/CC/build",
+  "command": "/usr/bin/clang++ -I/home/ning/CC/ning -g -Wall -Wextra -Wpedantic -std=gnu++11 -o CMakeFiles/enemy_demo.dir/test_enemy.cpp.o -c /home/ning/CC/ning/test_enemy.cpp",
+  "file": "/home/ning/CC/ning/test_enemy.cpp"
+},
+{
+  "directory": "/home/ning/CC/build",
+  "command": "/usr/bin/clang++ -I/home/ning/CC/ning -g -Wall -Wextra -Wpedantic -std=gnu++11 -o CMakeFiles/enemy_demo.dir/Player.cpp.o -c /home/ning/CC/ning/Player.cpp",
+  "file": "/home/ning/CC/ning/Player.cpp"
+},
+{
+  "directory": "/home/ning/CC/build",
+  "command": "/usr/bin/clang++ -I/home/ning/CC/ning -g -Wall -Wextra -Wpedantic -std=gnu++11 -o CMakeFiles/enemy_demo.dir/enemy_state.cpp.o -c /home/ning/CC/ning/enemy_state.cpp",
+  "file": "/home/ning/CC/ning/enemy_state.cpp"
+},
+{
+  "directory": "/home/ning/CC/build",
+  "command": "/usr/bin/clang++ -I/home/ning/CC/ning -g -Wall -Wextra -Wpedantic -std=gnu++11 -o CMakeFiles/enemy_demo.dir/player_state.cpp.o -c /home/ning/CC/ning/player_state.cpp",
+  "file": "/home/ning/CC/ning/player_state.cpp"
+},
+{
+  "directory": "/home/ning/CC/build",
+  "command": "/usr/bin/clang++ -I/home/ning/CC/ning -g -Wall -Wextra -Wpedantic -std=gnu++11 -o CMakeFiles/test_player_move.dir/Player.cpp.o -c /home/ning/CC/ning/Player.cpp",
+  "file": "/home/ning/CC/ning/Player.cpp"
+},
+{
+  "directory": "/home/ning/CC/build",
+  "command": "/usr/bin/clang++ -I/home/ning/CC/ning -g -Wall -Wextra -Wpedantic -std=gnu++11 -o CMakeFiles/test_player_move.dir/test_player_move.cpp.o -c /home/ning/CC/ning/test_player_move.cpp",
+  "file": "/home/ning/CC/ning/test_player_move.cpp"
+},
+{
+  "directory": "/home/ning/CC/build",
+  "command": "/usr/bin/clang++ -I/home/ning/CC/ning -g -Wall -Wextra -Wpedantic -std=gnu++11 -o CMakeFiles/test_player_move.dir/enemy.cpp.o -c /home/ning/CC/ning/enemy.cpp",
+  "file": "/home/ning/CC/ning/enemy.cpp"
+},
+{
+  "directory": "/home/ning/CC/build",
+  "command": "/usr/bin/clang++ -I/home/ning/CC/ning -g -Wall -Wextra -Wpedantic -std=gnu++11 -o CMakeFiles/test_player_move.dir/enemy_state.cpp.o -c /home/ning/CC/ning/enemy_state.cpp",
+  "file": "/home/ning/CC/ning/enemy_state.cpp"
+},
+{
+  "directory": "/home/ning/CC/build",
+  "command": "/usr/bin/clang++ -I/home/ning/CC/ning -g -Wall -Wextra -Wpedantic -std=gnu++11 -o CMakeFiles/test_player_move.dir/player_state.cpp.o -c /home/ning/CC/ning/player_state.cpp",
+  "file": "/home/ning/CC/ning/player_state.cpp"
+}
+]

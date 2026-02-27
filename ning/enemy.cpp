@@ -1,37 +1,23 @@
 #include "enemy.h"
 #include "enemy_state.h"
-#include <algorithm>
-#include <cmath>
 
-// define static consts (ODR-use)
-const int Enemy::MIN_POS;
-const int Enemy::MAX_POS;
-
-// helper
-static void clampPos(int &p) {
-    if (p < Enemy::MIN_POS) p = Enemy::MIN_POS;
-    if (p > Enemy::MAX_POS) p = Enemy::MAX_POS;
-}
-
-// ===== Enemy 实现 =====
-Enemy::Enemy(int hp, int pos, int patrol_a, int patrol_b, int tenacity)
-    : hp_(hp), tenacity_(tenacity), pos_(pos), player_pos_(-1), patrol_a_(patrol_a), patrol_b_(patrol_b), patrol_dir_(1), current_(nullptr)
-{
-    clampPos(pos_);
-    clampPos(patrol_a_);
-    clampPos(patrol_b_);
-    if (patrol_a_ > patrol_b_) std::swap(patrol_a_, patrol_b_);
-
-    patrolState_ = new PatrolState();
-    chaseState_ = new ChaseState();
-    attackState_ = new AttackState();
-    stunnedState_ = new StunnedState();
-    deadState_ = new DeadState();
-
+// 构造函数
+Enemy::Enemy(int attackDmg, int zhuijiDis, int attackDis, int hp, int pos, int patrol_a, int patrol_b, int tenacity)
+    : attackDmg_(attackDmg), zhuijiDis_(zhuijiDis), attackDis_(attackDis), hp_(hp), tenacity_(tenacity), pos_(pos), 
+      patrol_a_(patrol_a), patrol_b_(patrol_b), patrol_dir_(1), player_(nullptr) {
+    // 初始化状态
+    patrolState_ = new PatrolState(this);
+    chaseState_ = new ChaseState(this);
+    attackState_ = new AttackState(this);
+    stunnedState_ = new StunnedState(this);
+    deadState_ = new DeadState(this);
+    map_ = nullptr;
+    // 默认状态为巡逻
     current_ = patrolState_;
-    current_->enter(this);
+    current_->enter();
 }
 
+// 析构函数
 Enemy::~Enemy() {
     delete patrolState_;
     delete chaseState_;
@@ -40,11 +26,40 @@ Enemy::~Enemy() {
     delete deadState_;
 }
 
+// 设置地图
+void Enemy::setMap(Map* map) {
+    map_ = map;
+}
+
+// 获取地图
+Map* Enemy::getMap() const {
+    return map_;
+}
+// 设置玩家目标
+void Enemy::setPlayer(Player* player) {
+    player_ = player;
+}
+
+// 获取玩家目标
+Player* Enemy::getPlayer() const {
+    return player_;
+}
+
+// 清除玩家目标
+void Enemy::clearPlayer() {
+    player_ = nullptr;
+}
+
+
+
+// 状态管理
 void Enemy::setState(State* s) {
-    if (current_ == s) return;
-    if (current_) current_->exit(this);
+    if (current_) {
+        current_->exit();
+    }
     current_ = s;
-    if (current_) current_->enter(this);
+    // current_->setEnemy(this);
+    current_->enter();
 }
 
 State* Enemy::getPatrolState() const { return patrolState_; }
@@ -53,44 +68,73 @@ State* Enemy::getAttackState() const { return attackState_; }
 State* Enemy::getStunnedState() const { return stunnedState_; }
 State* Enemy::getDeadState() const { return deadState_; }
 
-void Enemy::move(int dir) { if(current_) current_->move(this, dir); }
-void Enemy::attack() { if(current_) current_->attack(this); }
-void Enemy::takeDamage(int dmg) { if(current_) current_->takeDamage(this, dmg); }
-void Enemy::update() { if(current_) current_->update(this); }
+// 对外动作
+void Enemy::move(int dir) {
+    current_->move(dir);
+}
 
-void Enemy::setPlayerPos(int p) { player_pos_ = p; clampPos(player_pos_); }
+void Enemy::attack() {
+    current_->attack();
+}
 
-int Enemy::getPlayerPos() const { return player_pos_; }
-int Enemy::getPatrolA() const { return patrol_a_; }
-int Enemy::getPatrolB() const { return patrol_b_; }
-int Enemy::getPatrolDir() const { return patrol_dir_; }
-void Enemy::setPatrolDir(int d) { patrol_dir_ = d; }
+void Enemy::takeDamage(int dmg) {
+    current_->takeDamage(dmg);
+    // if (hp_ <= 0) {
+    //     setState(deadState_);
+    // }
+}
 
+void Enemy::update() {
+    current_->update();
+}
+
+// tenacity 操作
 int Enemy::getTenacity() const { return tenacity_; }
 void Enemy::changeTenacity(int delta) {
     tenacity_ += delta;
-    std::cout << "tenacity=" << tenacity_ << "\n";
-    if (tenacity_ <= 0) {
-        std::cout << "Becomes stunned due to tenacity depletion\n";
-        setState(getStunnedState());
-    }
+    // if (tenacity_ <= 0) {
+    //     setState(stunnedState_);
+    // }
 }
 
+// 属性访问
 int Enemy::getHP() const { return hp_; }
 int Enemy::getPos() const { return pos_; }
-void Enemy::setPos(int p) { pos_ = p; clampPos(pos_); }
-void Enemy::setHP(int hp) {
-    hp_ = hp;
-    if (hp_ <= 0) setState(getDeadState());
+void Enemy::setPos(int p) {
+    if (p >= MIN_POS && p <= MAX_POS) {
+        int oldPos = pos_; // 保存旧位置
+        pos_ = p;
+        // 通知地图更新位置
+        if (map_) {
+            map_->updateEnemyPosition(this, oldPos);
+        }
+    }
+    
 }
-
+void Enemy::setHP(int hp) { hp_ = hp; }
 void Enemy::setPatrolPoints(int a, int b) {
-    patrol_a_ = std::max(MIN_POS, std::min(MAX_POS, a));
-    patrol_b_ = std::max(MIN_POS, std::min(MAX_POS, b));
-    if (patrol_a_ > patrol_b_) std::swap(patrol_a_, patrol_b_);
+    patrol_a_ = a;
+    patrol_b_ = b;
+}
+void Enemy::setPatrolDir(int d) {
+    patrol_dir_ = (d > 0) ? 1 : -1;
 }
 
-// ======== 状态实现 ========
+// 供状态访问的安全访问器
+int Enemy::getPatrolA() const { return patrol_a_; }
+int Enemy::setPatrolA(int a) { patrol_a_ = a; return patrol_a_; }
+int Enemy::getPatrolB() const { return patrol_b_; }
+int Enemy::setPatrolB(int b) { patrol_b_ = b; return patrol_b_; }
+int Enemy::getPatrolDir() const { return patrol_dir_; }
 
 
-
+int Enemy::getZhuijiDis() const { return zhuijiDis_; }
+int Enemy::getAttackDis() const { return attackDis_; }
+int Enemy::setZhuijiDis(int zhuijiDis) { zhuijiDis_ = zhuijiDis; return zhuijiDis_; }
+int Enemy::setAttackDis(int attackDis) { attackDis_ = attackDis; return attackDis_; }
+// 攻击伤害
+int Enemy::getAttackDmg() const { return attackDmg_; }
+void Enemy::setAttackDmg(int attackDmg) { attackDmg_ = attackDmg; }
+void Enemy::recoverTenacity() {
+    changeTenacity(5); // 恢复 5 点韧性
+}

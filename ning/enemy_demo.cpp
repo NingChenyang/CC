@@ -1,34 +1,49 @@
 #include "enemy.h"
-
+#include <iostream>
+#include "map.hpp"
 int main() {
-    // 初始化：HP=15，位置=2，巡逻点 2..6，韧性 3
-    Enemy e(15, 2, 2, 6, 3);
+    // 创建地图
+    Map map(10);
+    
+    // 创建敌人
+    Enemy enemy1(2, 1, 10, 2, 0, 4, 5);
+    // Enemy enemy2(15, 7, 5, 9, 8);
+    
+    // 将敌人添加到地图
+    map.addEnemy(&enemy1);
+    // map.addEnemy(&enemy2);
+    
+    // // 设置玩家位置
+    // map.setPlayerPos(5);
+    // std::cout << "Player position: " << map.getPlayerPos() << std::endl;
+    
+    // 更新敌人状态
+    std::cout << "\n=== Updating enemies ===\n";
+    // enemy1.update();
 
-    std::cout << "Initial: HP=" << e.getHP() << " pos=" << e.getPos() << "\n";
+    while (1) {
+        enemy1.update();
+    }
 
-    // 模拟若干帧，敌人在巡逻
-    for (int t = 0; t < 4; ++t) e.update();
-
-    // 玩家出现在远端（pos=8），触发追击
-    std::cout << "-- Player appears at 8 --\n";
-    e.setPlayerPos(8);
-    for (int t = 0; t < 6; ++t) e.update();
-
-    // 对敌人造成韧性伤害，使其瘫痪
-    std::cout << "-- Player hits tenacity --\n";
-    e.changeTenacity(-3); // tenacity -> 0 -> Stunned
-    e.update(); // Stunned 恢复并回到巡逻
-
-    // 再次让玩家出现并对敌人造成致命伤
-    std::cout << "-- Player appears and finishes enemy --\n";
-    e.setPlayerPos(4);
-    for (int t = 0; t < 2; ++t) e.update();
-    e.takeDamage(50); // 直接杀死
-
-    // 死亡后尝试动作
-    e.move(-1);
-    e.attack();
-
+    // enemy2.update();
+    
+    // // 玩家移动
+    // map.setPlayerPos(3);
+    // std::cout << "\nPlayer moved to: " << map.getPlayerPos() << std::endl;
+    
+    // // 再次更新敌人状态
+    // std::cout << "\n=== Updating enemies again ===\n";
+    // enemy1.update();
+    // enemy2.update();
+    
+    // // 玩家离开
+    // map.setPlayerPos(-1);
+    // std::cout << "\nPlayer left the map" << std::endl;
+    
+    // // 再次更新敌人状态
+    // std::cout << "\n=== Updating enemies after player left ===\n";
+    // enemy1.update();
+    // enemy2.update();
+    
     return 0;
 }
-

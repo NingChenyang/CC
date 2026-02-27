@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(EnemyStateMachine)
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Add include directories
@@ -11,13 +11,28 @@ include_directories(${PROJECT_SOURCE_DIR})
 # Add executable for enemy demo
 add_executable(enemy_demo
     enemy.cpp
-    enemy_demo.cpp
+    test_enemy.cpp
+    Player.cpp
+    map.hpp
     enemy_state.cpp
+    player_state.cpp
+)
+
+# Add executable for player move test
+add_executable(test_player_move
+    Player.cpp
+    test_player_move.cpp
+    enemy.cpp
+    map.hpp
+    enemy_state.cpp
+    player_state.cpp
 )
 
 # Optionally, set compiler flags for better diagnostics
 if(MSVC)
     target_compile_options(enemy_demo PRIVATE /W4)
+    target_compile_options(test_player_move PRIVATE /W4)
 else()
     target_compile_options(enemy_demo PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(test_player_move PRIVATE -Wall -Wextra -Wpedantic)
 endif()

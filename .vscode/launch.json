@@ -4,26 +4,112 @@
     // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
         {
-            "name": "MyLaunch",              //  强制：就一个名字而已，但是是必须要有的（取任意自己喜欢的名字即可）
-            "type": "cppdbg",                    //  强制：调试器的类型，Node debugger for  node, php for PHP , go for GO (C语言就固定是cppdbg)           
-            "request": "launch",                 //  强制：launch/attach
-            "program": "${workspaceFolder}/${fileBasenameNoExtension}", // 可执行文件的路径
-            "miDebuggerPath": "/usr/bin/gdb",    //  调试器的位置（根据实际情况调整）
-            "preLaunchTask":"C/C++: gcc.exe 生成活动文件",             //  强制：调试前编译任务名称（要和tasks.json中的lable字段一样）
-            "args": [],                          //  调试参数
+            "name": "cpp启动",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/server", //编译后可执行文件路径
+            "args": [
+                
+            ],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",         //  当前工作目录
-            "environment": [],                   //  当前项目环境变量
+            "cwd": "${fileDirname}",
+            "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",                     //  调试器模式/类型
+            "MIMode": "gdb",
             "setupCommands": [
                 {
-                    "description": "Enable pretty-printing for gdb",
+                    "description": "为 gdb 启用整齐打印",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
+                },
+                {
+                    "description": "将反汇编风格设置为 Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
                 }
-            ]
+            ],
+            "preLaunchTask": "C/C++: gcc 生成活动文件", // 与task中label一致
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "websocketerver启动",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/WS_Server", //编译后可执行文件路径
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "将反汇编风格设置为 Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "C/C++: gcc 生成活动文件", // 与task中label一致
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "mysql启动",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/mysql/test1", //编译后可执行文件路径
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "将反汇编风格设置为 Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "testmysql", // 与task中label一致
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "CMake敌人状态机",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/ning/build/enemy_demo",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/ning/build",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "将反汇编风格设置为 Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "CMake构建敌人状态机",
+            "miDebuggerPath": "/usr/bin/gdb"
         }
     ]
 }
