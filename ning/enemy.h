@@ -41,8 +41,10 @@ public:
 private:
     int attackDmg_; // 攻击伤害
     int zhuijiDis_; // 追击距离
+    int originalZhuijiDis_; // 原始追击距离
     int attackDis_; // 攻击距离
     int hp_;        //血量
+    int maxHp_;     // 最大血量
     int tenacity_; // 韧性（stun 机制）
     int pos_;
     int patrol_a_; // 巡逻端点A
@@ -56,6 +58,10 @@ private:
     DeadState* deadState_;//死亡
     Map* map_; // 地图指针
     Player* player_; // 玩家指针
+    bool isEnraged_; // 是否处于狂暴状态
+    int shield_; // 护盾值
+    bool hasBlinkStrike_; // 是否有瞬砍技能
+    int attackCount_; // 攻击计数器
 public:
     // patrol_a/patrol_b 为巡逻端点（0..9），tenacity 为初始韧性
     Enemy(int attackDmg = 1, int zhuijiDis = 2, int attackDis = 1, int hp = 10, int pos = 0, int patrol_a = 0, int patrol_b = 3, int tenacity = 5);
@@ -111,4 +117,15 @@ public:
     int getPatrolDir() const;
     Map* getMap() const;
     void recoverTenacity();
+    
+    // 狂暴状态相关方法
+    bool isEnraged() const { return isEnraged_; }
+    bool hasBlinkStrike() const { return hasBlinkStrike_; }
+    void useBlinkStrike() { hasBlinkStrike_ = false; }
+    int getShield() const { return shield_; }
+    int getMaxHp() const { return maxHp_; }
+    
+    // 攻击计数器相关方法
+    void incrementAttackCount() { attackCount_++; }
+    int getAttackCount() const { return attackCount_; }
 };

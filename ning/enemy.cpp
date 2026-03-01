@@ -3,8 +3,10 @@
 
 // 构造函数
 Enemy::Enemy(int attackDmg, int zhuijiDis, int attackDis, int hp, int pos, int patrol_a, int patrol_b, int tenacity)
-    : attackDmg_(attackDmg), zhuijiDis_(zhuijiDis), attackDis_(attackDis), hp_(hp), tenacity_(tenacity), pos_(pos), 
-      patrol_a_(patrol_a), patrol_b_(patrol_b), patrol_dir_(1), player_(nullptr) {
+    : attackDmg_(attackDmg), zhuijiDis_(zhuijiDis), originalZhuijiDis_(zhuijiDis), attackDis_(attackDis), 
+      hp_(hp), maxHp_(hp), tenacity_(tenacity), pos_(pos), 
+      patrol_a_(patrol_a), patrol_b_(patrol_b), patrol_dir_(1), player_(nullptr),
+      isEnraged_(false), shield_(0), hasBlinkStrike_(false), attackCount_(0) {
     // 初始化状态
     patrolState_ = new PatrolState(this);
     chaseState_ = new ChaseState(this);
@@ -77,10 +79,31 @@ void Enemy::attack() {
 }
 
 void Enemy::takeDamage(int dmg) {
-    current_->takeDamage(dmg);
-    // if (hp_ <= 0) {
-    //     setState(deadState_);
-    // }
+    int remainingDamage = dmg;
+    
+    // 如果有护盾，先消耗护盾值
+    if (shield_ > 0) {
+        if (dmg <= shield_) {
+            // 护盾完全吸收伤害
+            shield_ -= dmg;
+            remainingDamage = 0;
+            std::cout << "敌人的护盾吸收了全部伤害！剩余护盾值: " << shield_ << std::endl;
+        } else {
+            // 护盾部分吸收伤害
+            remainingDamage = dmg - shield_;
+            std::cout << "敌人的护盾吸收了 " << shield_ << " 点伤害，剩余伤害: " << remainingDamage << std::endl;
+            shield_ = 0;
+        }
+    }
+    
+    // 剩余伤害伤害血量
+    if (remainingDamage > 0) {
+        current_->takeDamage(remainingDamage);
+    }
+    
+    if (hp_ <= 0) {
+        setState(deadState_);
+    }
 }
 
 void Enemy::update() {
@@ -110,7 +133,21 @@ void Enemy::setPos(int p) {
     }
     
 }
-void Enemy::setHP(int hp) { hp_ = hp; }
+void Enemy::setHP(int hp) {
+    hp_ = hp;
+    if (hp_ < 0) hp_ = 0;
+    
+    // 检查是否触发狂暴状态（血量低于10%）
+    if (!isEnraged_ && hp_ <= maxHp_ * 0.1) {
+        isEnraged_ = true;
+        shield_ = static_cast<int>(maxHp_ * 0.3); // 护盾值为最大血量的30%
+        hasBlinkStrike_ = true;
+        // 提升追击距离至3格
+        zhuijiDis_ = 3;
+        std::cout << "\n=== 敌人进入狂暴状态！ ===" << std::endl;
+        std::cout << "敌人获得护盾值: " << shield_ << "，追击距离提升至3格，获得瞬砍技能！" << std::endl;
+    }
+}
 void Enemy::setPatrolPoints(int a, int b) {
     patrol_a_ = a;
     patrol_b_ = b;

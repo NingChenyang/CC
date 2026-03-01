@@ -144,8 +144,54 @@ void AttackState::update() {
     enemy_->setState(enemy_->getPatrolState());
     return;
   }
+  
+  // 检查是否可以使用瞬砍技能
+  int dist = std::abs(player->getPos() - enemy_->getPos());
+  
+  // 计算攻击力
+  int attackDmg = enemy_->getAttackDmg();
+  
+  // 检查是否触发瞬砍技能
+  if (enemy_->isEnraged() && enemy_->hasBlinkStrike() && dist == 3) {
+    std::cout << "\n=== 敌人发动瞬砍技能！ ===" << std::endl;
+    std::cout << "敌人瞬间移动到玩家位置并发动攻击！" << std::endl;
+    
+    // 移动到玩家位置
+    enemy_->setPos(player->getPos());
+    
+    // 计算狂暴状态下的近战攻击力（近战攻击*狂暴buff2倍增伤）
+    attackDmg = static_cast<int>(attackDmg * 2 * 2); // 近战2倍 * 狂暴2倍
+    std::cout << "瞬砍攻击力: " << attackDmg << std::endl;
+    
+    // 消耗瞬砍技能
+    enemy_->useBlinkStrike();
+  } else if (dist == 0) {
+    // 距离为0时的近战攻击
+    if (enemy_->isEnraged()) {
+      // 狂暴状态下的近战攻击
+      attackDmg = static_cast<int>(attackDmg * 2 * 2); // 近战2倍 * 狂暴2倍
+      std::cout << "敌人发动狂暴近战攻击！攻击力提升至: " << attackDmg << std::endl;
+    } else {
+      // 普通近战攻击
+      attackDmg = static_cast<int>(attackDmg * 2);
+      std::cout << "敌人发动近战攻击！攻击力提升至: " << attackDmg << std::endl;
+    }
+  } else if (enemy_->isEnraged()) {
+    // 狂暴状态下的普通攻击
+    attackDmg = static_cast<int>(attackDmg * 2);
+    std::cout << "敌人发动狂暴攻击！攻击力提升至: " << attackDmg << std::endl;
+  }
+  
+  // 检查是否是第四下攻击（每攻击三下，第四下攻击*2）
+  enemy_->incrementAttackCount();
+  if (enemy_->getAttackCount() % 4 == 0) {
+    int originalDmg = attackDmg;
+    attackDmg = static_cast<int>(attackDmg * 2);
+    std::cout << "敌人发动强化攻击！攻击力提升至: " << attackDmg << " (原本: " << originalDmg << ")" << std::endl;
+  }
+  
   std::cout << "攻击目标" << std::endl;
-  player->takeDamage(enemy_->getAttackDmg());
+  player->takeDamage(attackDmg);
 
   // 检查状态转换
   checkStateTransition();
@@ -174,6 +220,30 @@ void StunnedState::exit() { std::cout << "Exit Stunned\n"; }
 void StunnedState::update() {
   if (!enemy_)
     return;
+  
+  // 检查是否血量小于等于10%，如果是，直接苏醒进入狂暴状态
+  int maxHp = enemy_->getMaxHp();
+  int currentHp = enemy_->getHP();
+  if (currentHp <= maxHp * 0.1) {
+    std::cout << "\n=== 敌人血量过低，强制苏醒并进入狂暴状态！ ===" << std::endl;
+    enemy_->recoverTenacity(); // 恢复韧性
+    
+    // 触发狂暴状态
+    enemy_->setHP(currentHp); // 重新设置血量，触发狂暴状态
+    
+    Player *player = enemy_->getPlayer();
+    if (!player) {
+      std::cout << "目标丢失，继续巡逻" << std::endl;
+      enemy_->clearPlayer();
+      enemy_->setState(enemy_->getPatrolState());
+      return;
+    }
+    
+    // 检查状态转换
+    checkStateTransition();
+    return;
+  }
+  
   turns_++;
   std::cout << "Stunned: recovering... (turn " << turns_ << "/2)\n";
 

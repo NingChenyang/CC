@@ -7,7 +7,7 @@
 void printGameState(Player& player, Enemy& enemy) {
     std::cout << "\n=== 游戏状态 ===" << std::endl;
     std::cout << "玩家位置: " << player.getPos() << ", 血量: " << player.getHp() << std::endl;
-    std::cout << "敌人位置: " << enemy.getPos() << ", 血量: " << enemy.getHP() << ", 韧性: " << enemy.getTenacity() << std::endl;
+    std::cout << "敌人位置: " << enemy.getPos() << ", 血量: " << enemy.getHP() << ", 韧性: " << enemy.getTenacity() << ", 护盾: " << enemy.getShield() << std::endl;
     std::cout << "距离: " << std::abs(player.getPos() - enemy.getPos()) << std::endl;
     std::cout << "==============" << std::endl;
 }
@@ -35,7 +35,7 @@ int main() {
     map.setPlayer(&player);
     
     // 创建敌人
-    Enemy enemy(2, 2, 1, 20, 8,
+    Enemy enemy(2, 2, 1, 50, 8,
          5, 9, 10);
     enemy.setMap(&map);
     map.addEnemy(&enemy);
@@ -48,7 +48,9 @@ int main() {
     
     while (!gameOver) {
         std::cout << "\n请输入操作: ";
-        std::cin >> input;
+        std::string inputStr;
+        std::cin >> inputStr;
+        char input = (inputStr.empty()) ? ' ' : inputStr[0]; // 只取第一个字符
         
         switch (input) {
             case 'a':
