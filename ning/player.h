@@ -49,6 +49,7 @@ public:
 
     // 状态管理
     void setState(PlayerState* s);
+    PlayerState* getCurrentState() const { return current_; }
     PlayerState* getIdleState() const;
     PlayerState* getEngageState() const;
     PlayerState* getAlertState() const;

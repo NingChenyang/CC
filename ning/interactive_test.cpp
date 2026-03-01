@@ -57,10 +57,34 @@ int main() {
             case 'q':
             case 'e':
             case 'f':
-                // 玩家执行操作
-                player.update(input);
-                // 敌人执行动作
+                // 玩家执行移动操作（不触发状态转换）
+                switch (input) {
+                    case 'a': // 左移动一格
+                        player.move(-1);
+                        break;
+                    case 'd': // 右移动一格
+                        player.move(1);
+                        break;
+                    case 's': // 不动
+                        // 不移动
+                        break;
+                    case 'q': // 左移动两格
+                        player.move(-2);
+                        break;
+                    case 'e': // 右移动两格
+                        player.move(2);
+                        break;
+                    case 'f': // 攻击敌人
+                        player.attack();
+                        break;
+                }
+                
+                // 敌人执行动作（移动和状态转换）
                 enemy.update();
+                
+                // 玩家检查状态转换
+                player.getCurrentState()->update();
+                
                 // 检查游戏结束条件
                 if (player.isDead()) {
                     std::cout << "\n=== 游戏结束：玩家死亡 ===" << std::endl;
@@ -74,6 +98,8 @@ int main() {
                 break;
             case 'h':
                 printHelp();
+                // 显示帮助时，敌人AI不动
+                printGameState(player, enemy);
                 break;
             case 'x':
                 std::cout << "\n=== 游戏退出 ===" << std::endl;
