@@ -58,7 +58,6 @@ void Enemy::setState(State* s) {
         current_->exit();
     }
     current_ = s;
-    // current_->setEnemy(this);
     current_->enter();
 }
 

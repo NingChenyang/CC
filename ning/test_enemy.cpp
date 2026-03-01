@@ -1,5 +1,5 @@
 #include "enemy.h"
-#include "Player.h"
+#include "player.h"
 #include "map.hpp"
 #include <iostream>
 #include <thread>

@@ -12,7 +12,7 @@ include_directories(${PROJECT_SOURCE_DIR})
 add_executable(enemy_demo
     enemy.cpp
     test_enemy.cpp
-    Player.cpp
+    player.cpp
     map.hpp
     enemy_state.cpp
     player_state.cpp
@@ -20,14 +20,21 @@ add_executable(enemy_demo
 
 # Add executable for player move test
 add_executable(test_player_move
-    Player.cpp
+    player.cpp
     test_player_move.cpp
     enemy.cpp
     map.hpp
     enemy_state.cpp
     player_state.cpp
 )
-
+add_executable(interactive_test
+    player.cpp
+    interactive_test.cpp
+    enemy.cpp
+    map.hpp
+    enemy_state.cpp
+    player_state.cpp
+)
 # Optionally, set compiler flags for better diagnostics
 if(MSVC)
     target_compile_options(enemy_demo PRIVATE /W4)

@@ -16,7 +16,8 @@
 					"targetIndexes" : 
 					[
 						0,
-						1
+						1,
+						2
 					]
 				}
 			],
@@ -32,7 +33,8 @@
 					"targetIndexes" : 
 					[
 						0,
-						1
+						1,
+						2
 					]
 				}
 			],
@@ -41,14 +43,21 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "enemy_demo::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-enemy_demo-Debug-b6584179268fa100ceb9.json",
+					"jsonFile" : "target-enemy_demo-Debug-f8100c515c4349c4e394.json",
 					"name" : "enemy_demo",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
+					"id" : "interactive_test::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-interactive_test-Debug-eaf2521a5e07db97e738.json",
+					"name" : "interactive_test",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
 					"id" : "test_player_move::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-test_player_move-Debug-94bf4736024f585ace50.json",
+					"jsonFile" : "target-test_player_move-Debug-9329509df4ce7e8189db.json",
 					"name" : "test_player_move",
 					"projectIndex" : 0
 				}

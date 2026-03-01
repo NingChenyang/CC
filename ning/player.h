@@ -61,9 +61,10 @@ private:
     EngageState* engageState_;
     AlertState* alertState_;
     PlayerDeadState* deadState_;
-    Enemy* enemy_;
+    
     int engageDistance_;
     int alertDistance_;
     int attackDamage_;
+    Enemy* enemy_;
     Map *map_;
 };

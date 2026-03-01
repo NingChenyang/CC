@@ -1,5 +1,5 @@
 #include "player_state.h"
-#include "Player.h"
+#include "player.h"
 #include "enemy.h"
 #include "map.hpp"
 #include <iostream>

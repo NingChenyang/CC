@@ -3,10 +3,48 @@
 
 class Enemy;
 class Player;
+
+// 状态转换辅助方法
+void State::checkStateTransition() {
+    if (!enemy_) return;
+    
+    Map *map = enemy_->getMap();
+    Player *player = enemy_->getPlayer();
+    
+    // 如果没有玩家，切换到巡逻状态
+    if (!player) {
+        player = map->detectPlayer(enemy_->getPos(), enemy_->getZhuijiDis());
+        if (!player) {
+            // 已经在巡逻状态，不需要切换
+            return;
+        }
+        enemy_->setPlayer(player);
+    }
+    
+    int dist = std::abs(player->getPos() - enemy_->getPos());
+    
+    // 根据距离切换状态
+    if (dist > enemy_->getZhuijiDis()) {
+        std::cout << "Enemy: 目标丢失，切换到巡逻状态" << std::endl;
+        enemy_->clearPlayer();
+        enemy_->setState(enemy_->getPatrolState());
+    } else if (dist <= enemy_->getAttackDis()) {
+        // 如果不在攻击状态，切换到攻击状态
+        if (dynamic_cast<AttackState*>(this) == nullptr) {
+            std::cout << "Enemy: 目标在攻击范围内，切换到攻击状态" << std::endl;
+            enemy_->setState(enemy_->getAttackState());
+        }
+    } else {
+        // 如果不在追击状态，切换到追击状态
+        if (dynamic_cast<ChaseState*>(this) == nullptr) {
+            std::cout << "Enemy: 目标在追击范围，切换到追击状态" << std::endl;
+            enemy_->setState(enemy_->getChaseState());
+        }
+    }
+}
 void PatrolState::enter() { std::cout << "进入巡逻" << std::endl; }
 void PatrolState::exit() { std::cout << "退出巡逻" << std::endl; }
 void PatrolState::update() {
-
   if (!enemy_)
     return;
   Map *map = enemy_->getMap();
@@ -14,15 +52,6 @@ void PatrolState::update() {
     return;
 
   // 巡逻移动一步
-  // 如果到了边界，改变方向
-  // if (enemy_->getPos() <= enemy_->getPatrolA() || enemy_->getPos() >=
-  // enemy_->getPatrolB()) {
-  //     int dir = -enemy_->getPatrolDir();
-  //     enemy_->setPatrolDir(dir);
-  // }
-
-  //   int dir = enemy_->getPatrolDir();
-  //   int next = enemy_->getPos() + dir;
   // 检查是否到达巡逻边界
   int minPos = map->getRight() / 2;
   int maxPos = map->getRight();
@@ -47,24 +76,13 @@ void PatrolState::update() {
   int next = enemy_->getPos() + enemy_->getPatrolDir();
   // 更新位置
   if (map->isValidPos(next)) {
-
     enemy_->setPos(next);
   }
 
   std::cout << "Patrol: pos -> " << enemy_->getPos() << std::endl;
 
-  Player *player = map->detectPlayer(enemy_->getPos(), enemy_->getZhuijiDis());
-  if (player == nullptr) {
-    enemy_->clearPlayer();
-    return;
-  } // 没找到玩家，继续巡逻
-  enemy_->setPlayer(player); // 设置目标
-  int dist = std::abs(player->getPos() - enemy_->getPos());
-  if (dist <= enemy_->getAttackDis()) { // 如果玩家在攻击范围内直接进入攻击状态
-    enemy_->setState(enemy_->getAttackState()); // 进入攻击
-    return;                                     // 进入攻击状态后，不继续巡逻
-  }
-  enemy_->setState(enemy_->getChaseState()); // 进入追击状态
+  // 检查状态转换
+  checkStateTransition();
 }
 void PatrolState::move(int dir) {}
 void PatrolState::attack() { std::cout << "Patrol: no attack\n"; }
@@ -103,17 +121,8 @@ void ChaseState::update() {
   std::cout << "Chase: move to " << enemy_->getPos() << " (target=" << target
             << ")\n";
 
-  int dist = std::abs(player->getPos() - enemy_->getPos());
-  if (dist > enemy_->getZhuijiDis()) {
-    std::cout << "目标丢失，继续巡逻" << std::endl;
-    enemy_->clearPlayer();
-    enemy_->setState(enemy_->getPatrolState());
-    return;
-  } else if (dist <= enemy_->getAttackDis()) {
-    std::cout << "目标在攻击范围内，切换至攻击状态" << std::endl;
-    enemy_->setState(enemy_->getAttackState());
-    return;
-  }
+  // 检查状态转换
+  checkStateTransition();
 }
 void ChaseState::move(int dir) {}
 void ChaseState::attack() { std::cout << "Chase: not in range\n"; }
@@ -138,20 +147,8 @@ void AttackState::update() {
   std::cout << "攻击目标" << std::endl;
   player->takeDamage(enemy_->getAttackDmg());
 
-  int dist = std::abs(player->getPos() - enemy_->getPos());
-  if (dist > enemy_->getZhuijiDis()) {
-    std::cout << "目标丢失，继续巡逻" << std::endl;
-    enemy_->clearPlayer();
-    enemy_->setState(enemy_->getPatrolState());
-    return;
-  } else if (dist <= enemy_->getAttackDis()) {
-    std::cout << "目标在攻击范围内，切换至攻击状态" << std::endl;
-    return;
-  } else {
-    std::cout << "目标在追击范围，切换至追击状态" << std::endl;
-    enemy_->setState(enemy_->getChaseState());
-    return;
-  }
+  // 检查状态转换
+  checkStateTransition();
 }
 void AttackState::move(int dir) { (void)dir; }
 void AttackState::attack() { std::cout << "Attack: direct attack call\n"; }
@@ -192,20 +189,8 @@ void StunnedState::update() {
       return;
     }
 
-    int dist = std::abs(player->getPos() - enemy_->getPos());
-    if (dist > enemy_->getZhuijiDis()) {
-      std::cout << "目标丢失，继续巡逻" << std::endl;
-      enemy_->clearPlayer();
-      enemy_->setState(enemy_->getPatrolState());
-      return;
-    } else if (dist <= enemy_->getAttackDis()) {
-      std::cout << "目标在攻击范围内，切换至攻击状态" << std::endl;
-      enemy_->setState(enemy_->getAttackState());
-      return;
-    } else {
-      std::cout << "目标在追击范围，继续追击" << std::endl;
-      enemy_->setState(enemy_->getChaseState());
-    }
+    // 检查状态转换
+    checkStateTransition();
   }
 }
 void StunnedState::move(int dir) {

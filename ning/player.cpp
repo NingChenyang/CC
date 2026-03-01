@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "player.h"
 #include "player_state.h"
 #include "map.hpp"
 #include <iostream>
@@ -62,6 +62,9 @@ void Player::update(char moveCommand) {
         case 'e': // 右移动两格
             move(2);
             break;
+        case 'f': // 攻击敌人
+            attack();
+            break;
         default:
             // 无效指令，不移动
             break;
@@ -106,7 +109,6 @@ void Player::setState(PlayerState* s) {
         current_->exit();
     }
     current_ = s;
-    current_->setPlayer(this);
     current_->enter();
 }
 

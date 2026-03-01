@@ -23,6 +23,7 @@ public:
     virtual void attack() = 0;
     virtual void takeDamage(int dmg) = 0;
     virtual void update() = 0;
+    void checkStateTransition();
 };
 
 // 前置声明具体状态类
