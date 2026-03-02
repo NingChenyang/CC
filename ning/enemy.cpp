@@ -62,6 +62,8 @@ void Enemy::setState(State* s) {
     current_ = s;
     current_->enter();
 }
+// 获取当前状态
+State* Enemy::getCurrentState() const { return current_; }
 
 State* Enemy::getPatrolState() const { return patrolState_; }
 State* Enemy::getChaseState() const { return chaseState_; }
@@ -69,14 +71,8 @@ State* Enemy::getAttackState() const { return attackState_; }
 State* Enemy::getStunnedState() const { return stunnedState_; }
 State* Enemy::getDeadState() const { return deadState_; }
 
-// 对外动作
-void Enemy::move(int dir) {
-    current_->move(dir);
-}
 
-void Enemy::attack() {
-    current_->attack();
-}
+
 
 void Enemy::takeDamage(int dmg) {
     int remainingDamage = dmg;
@@ -169,5 +165,6 @@ int Enemy::setAttackDis(int attackDis) { attackDis_ = attackDis; return attackDi
 int Enemy::getAttackDmg() const { return attackDmg_; }
 void Enemy::setAttackDmg(int attackDmg) { attackDmg_ = attackDmg; }
 void Enemy::recoverTenacity() {
-    changeTenacity(5); // 恢复 5 点韧性
+    // changeTenacity(10); // 恢复 5 点韧性
+    tenacity_ = 10;
 }

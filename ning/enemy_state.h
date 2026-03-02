@@ -9,10 +9,9 @@ public:
     PatrolState(Enemy* enemy) : State(enemy) {}
     void enter() override;
     void exit() override;
-    void move(int dir) override;
-    void attack() override;
     void takeDamage(int dmg) override;
     void update() override;
+    std::string getName() const override { return "Patrol"; }
 };
 
 class ChaseState : public State {
@@ -20,10 +19,9 @@ public:
     ChaseState(Enemy* enemy) : State(enemy) {}
     void enter() override;
     void exit() override;
-    void move(int dir) override;
-    void attack() override;
     void takeDamage(int dmg) override;
     void update() override;
+    std::string getName() const override { return "Chase"; }
 };
 
 class AttackState : public State {
@@ -31,10 +29,9 @@ public:
     AttackState(Enemy* enemy) : State(enemy) {}
     void enter() override;
     void exit() override;
-    void move(int dir) override;
-    void attack() override;
     void takeDamage(int dmg) override;
     void update() override;
+    std::string getName() const override { return "Attack"; }
 };
 
 class StunnedState : public State {
@@ -44,10 +41,11 @@ public:
     StunnedState(Enemy* enemy) : State(enemy), turns_(0) {}
     void enter() override;
     void exit() override;
-    void move(int dir) override;
-    void attack() override;
     void takeDamage(int dmg) override;
     void update() override;
+    int getTurns() const { return turns_; }
+    void setTurns(int t) { turns_ = t; }
+    std::string getName() const override { return "Stunned"; }
 };
 
 class DeadState : public State {
@@ -55,8 +53,7 @@ public:
     DeadState(Enemy* enemy) : State(enemy) {}
     void enter() override;
     void exit() override;
-    void move(int dir) override;
-    void attack() override;
     void takeDamage(int dmg) override;
     void update() override;
+    std::string getName() const override { return "Dead"; }
 };

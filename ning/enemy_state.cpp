@@ -6,8 +6,100 @@ class Player;
 
 // 状态转换辅助方法
 void State::checkStateTransition() {
+  
   if (!enemy_)
     return;
+  if (dynamic_cast<DeadState *>(this) == enemy_->getDeadState())
+  {return;}
+  if (enemy_->getHP() <= 0) {
+    enemy_->setState(enemy_->getDeadState());
+    return;
+  }
+
+  if (enemy_->isEnraged()) {
+    enemy_->recoverTenacity(); // 恢复韧性
+    Map *map = enemy_->getMap();
+    Player *player = enemy_->getPlayer();
+
+    // 如果没有玩家，切换到巡逻状态
+    if (!player) {
+      player = map->detectPlayer(enemy_->getPos(), enemy_->getZhuijiDis());
+      if (!player) {
+        // 已经在巡逻状态，不需要切换
+        return;
+      }
+      enemy_->setPlayer(player);
+    }
+
+    int dist = std::abs(player->getPos() - enemy_->getPos());
+
+    // 根据距离切换状态
+    if (dist > enemy_->getZhuijiDis()) {
+      std::cout << "Enemy: 目标丢失，切换到巡逻状态" << std::endl;
+      enemy_->clearPlayer();
+      enemy_->setState(enemy_->getPatrolState());
+    } else if (dist <= enemy_->getAttackDis()) {
+      // 如果不在攻击状态，切换到攻击状态
+      if (dynamic_cast<AttackState *>(this) == nullptr) {
+        std::cout << "Enemy: 目标在攻击范围内，切换到攻击状态" << std::endl;
+        enemy_->setState(enemy_->getAttackState());
+      }
+    } else {
+      // 如果不在追击状态，切换到追击状态
+      if (dynamic_cast<ChaseState *>(this) == nullptr) {
+        std::cout << "Enemy: 目标在追击范围，切换到追击状态" << std::endl;
+        enemy_->setState(enemy_->getChaseState());
+      }
+    }
+    return;
+  }
+  if (dynamic_cast<StunnedState *>(this) == enemy_->getStunnedState() &&
+      enemy_->getTenacity() <= 0) {
+    // 经过两个回合后恢复
+    if (dynamic_cast<StunnedState *>(this)->getTurns() >= 2) {
+      enemy_->recoverTenacity(); // 恢复韧性
+
+      Player *player = enemy_->getPlayer();
+      if (!player) {
+        std::cout << "目标丢失，继续巡逻" << std::endl;
+        enemy_->clearPlayer();
+        enemy_->setState(enemy_->getPatrolState());
+        return;
+      }
+      checkStateTransition();
+    }
+    return;
+  }
+
+  // if (enemy_->getHP() <= enemy_->getMaxHp() * 0.1) {
+
+  //   enemy_->recoverTenacity(); // 恢复韧性
+
+  //   // // 触发狂暴状态
+  //   // enemy_->setHP(enemy_->getMaxHp()); // 重新设置血量，触发狂暴状态
+
+  //   Player *player = enemy_->getPlayer();
+  //   if (!player) {
+  //     std::cout << "目标丢失，继续巡逻" << std::endl;
+  //     enemy_->clearPlayer();
+  //     enemy_->setState(enemy_->getPatrolState());
+
+  //     return;
+  //   }
+  //   // if (dynamic_cast<StunnedState *>(this) == enemy_->getStunnedState())
+  //   // {
+  //   //   dynamic_cast<StunnedState *>(this)->setTurns(2);
+  //   //   checkStateTransition();
+  //   // }
+  //   // 检查状态转换
+  //   // checkStateTransition();
+  //   return;
+  // }
+
+  if (enemy_->getTenacity() <= 0 && !enemy_->isEnraged()) {
+    enemy_->setState(enemy_->getStunnedState());
+    return;
+  }
 
   Map *map = enemy_->getMap();
   Player *player = enemy_->getPlayer();
@@ -83,10 +175,9 @@ void PatrolState::update() {
   std::cout << "Patrol: pos -> " << enemy_->getPos() << std::endl;
 
   // 检查状态转换
-  checkStateTransition();
+  // checkStateTransition();
 }
-void PatrolState::move(int dir) {}
-void PatrolState::attack() { std::cout << "Patrol: no attack\n"; }
+
 void PatrolState::takeDamage(int dmg) {
   // 玩家只会近战，不会受到攻击
 }
@@ -95,6 +186,7 @@ void PatrolState::takeDamage(int dmg) {
 void ChaseState::enter() { std::cout << "进入追击" << std::endl; }
 void ChaseState::exit() { std::cout << "退出追击" << std::endl; }
 void ChaseState::update() {
+
   if (!enemy_)
     return;
   Map *map = enemy_->getMap();
@@ -150,11 +242,10 @@ void ChaseState::update() {
   std::cout << "Chase: move to " << enemy_->getPos() << " (target=" << target
             << ")\n";
 
-  // 检查状态转换
-  checkStateTransition();
+  // // 检查状态转换
+  // checkStateTransition();
 }
-void ChaseState::move(int dir) {}
-void ChaseState::attack() { std::cout << "Chase: not in range\n"; }
+
 void ChaseState::takeDamage(int dmg) {
   std::cout << "Chase: takeDamage " << dmg << "\n";
   enemy_->setHP(enemy_->getHP() - dmg);
@@ -180,21 +271,22 @@ void AttackState::update() {
   // 计算攻击力
   int attackDmg = enemy_->getAttackDmg();
 
-  // 检查是否触发瞬砍技能
-  if (enemy_->isEnraged() && enemy_->hasBlinkStrike() && dist == 3) {
-    std::cout << "\n=== 敌人发动瞬砍技能！ ===" << std::endl;
-    std::cout << "敌人瞬间移动到玩家位置并发动攻击！" << std::endl;
+  // // 检查是否触发瞬砍技能
+  // if (enemy_->isEnraged() && enemy_->hasBlinkStrike() && dist == 3) {
+  //   std::cout << "\n=== 敌人发动瞬砍技能！ ===" << std::endl;
+  //   std::cout << "敌人瞬间移动到玩家位置并发动攻击！" << std::endl;
 
-    // 移动到玩家位置
-    enemy_->setPos(player->getPos());
+  //   // 移动到玩家位置
+  //   enemy_->setPos(player->getPos());
 
-    // 计算狂暴状态下的近战攻击力（近战攻击*狂暴buff2倍增伤）
-    attackDmg = static_cast<int>(attackDmg * 2 * 2); // 近战2倍 * 狂暴2倍
-    std::cout << "瞬砍攻击力: " << attackDmg << std::endl;
+  //   // 计算狂暴状态下的近战攻击力（近战攻击*狂暴buff2倍增伤）
+  //   attackDmg = static_cast<int>(attackDmg * 2 * 2); // 近战2倍 * 狂暴2倍
+  //   std::cout << "瞬砍攻击力: " << attackDmg << std::endl;
 
-    // 消耗瞬砍技能
-    enemy_->useBlinkStrike();
-  } else if (dist == 0) {
+  //   // 消耗瞬砍技能
+  //   enemy_->useBlinkStrike();
+  // } else 
+  if (dist == 0) {
     // 距离为0时的近战攻击
     if (enemy_->isEnraged()) {
       // 狂暴状态下的近战攻击
@@ -224,22 +316,14 @@ void AttackState::update() {
   std::cout << "攻击目标" << std::endl;
   player->takeDamage(attackDmg);
 
-  // 检查状态转换
-  checkStateTransition();
+
 }
-void AttackState::move(int dir) { (void)dir; }
-void AttackState::attack() { std::cout << "Attack: direct attack call\n"; }
+
 void AttackState::takeDamage(int dmg) {
   std::cout << "Attack: takeDamage " << dmg << "\n";
   enemy_->setHP(enemy_->getHP() - dmg);
+  if (!enemy_->isEnraged())
   enemy_->changeTenacity(-1 * dmg); // 攻击后减少韧性暂时设置与伤害相同
-  if (enemy_->getHP() <= 0) {
-    enemy_->setState(enemy_->getDeadState());
-    return;
-  }
-  if (enemy_->getTenacity() <= 0) {
-    enemy_->setState(enemy_->getStunnedState());
-  }
 }
 
 // Stunned: 韧性为 0 时进入，无法行动，短时间后恢复韧性并回到巡逻
@@ -255,51 +339,47 @@ void StunnedState::update() {
   // 检查是否血量小于等于10%，如果是，直接苏醒进入狂暴状态
   int maxHp = enemy_->getMaxHp();
   int currentHp = enemy_->getHP();
-  if (currentHp <= maxHp * 0.1) {
-    std::cout << "\n=== 敌人血量过低，强制苏醒并进入狂暴状态！ ==="
-              << std::endl;
-    enemy_->recoverTenacity(); // 恢复韧性
+  // if (currentHp <= maxHp * 0.1) {
+  //   std::cout << "\n=== 敌人血量过低，强制苏醒并进入狂暴状态！ ==="
+  //             << std::endl;
+  //   enemy_->recoverTenacity(); // 恢复韧性
 
-    // 触发狂暴状态
-    enemy_->setHP(currentHp); // 重新设置血量，触发狂暴状态
+  //   // 触发狂暴状态
+  //   enemy_->setHP(currentHp); // 重新设置血量，触发狂暴状态
 
-    Player *player = enemy_->getPlayer();
-    if (!player) {
-      std::cout << "目标丢失，继续巡逻" << std::endl;
-      enemy_->clearPlayer();
-      enemy_->setState(enemy_->getPatrolState());
-      return;
-    }
+  //   Player *player = enemy_->getPlayer();
+  //   if (!player) {
+  //     std::cout << "目标丢失，继续巡逻" << std::endl;
+  //     enemy_->clearPlayer();
+  //     enemy_->setState(enemy_->getPatrolState());
+  //     return;
+  //   }
 
-    // 检查状态转换
-    checkStateTransition();
-    return;
-  }
+  //   // 检查状态转换
+  //   // checkStateTransition();
+  //   return;
+  // }
 
   turns_++;
   std::cout << "Stunned: recovering... (turn " << turns_ << "/2)\n";
 
-  // 经过两个回合后恢复
-  if (turns_ >= 2) {
-    enemy_->recoverTenacity(); // 恢复韧性
+  // // 经过两个回合后恢复
+  // if (turns_ >= 2) {
+  //   enemy_->recoverTenacity(); // 恢复韧性
 
-    Player *player = enemy_->getPlayer();
-    if (!player) {
-      std::cout << "目标丢失，继续巡逻" << std::endl;
-      enemy_->clearPlayer();
-      enemy_->setState(enemy_->getPatrolState());
-      return;
-    }
+  //   Player *player = enemy_->getPlayer();
+  //   if (!player) {
+  //     std::cout << "目标丢失，继续巡逻" << std::endl;
+  //     enemy_->clearPlayer();
+  //     enemy_->setState(enemy_->getPatrolState());
+  //     return;
+  //   }
 
-    // 检查状态转换
-    checkStateTransition();
-  }
+  //   // 检查状态转换
+  //   // checkStateTransition();
+  // }
 }
-void StunnedState::move(int dir) {
-  (void)dir;
-  std::cout << "Stunned: cannot move\n";
-}
-void StunnedState::attack() { std::cout << "Stunned: cannot attack\n"; }
+
 void StunnedState::takeDamage(int dmg) {
   std::cout << "Stunned: takeDamage " << dmg << "\n";
   enemy_->setHP(enemy_->getHP() - dmg);
@@ -309,11 +389,7 @@ void StunnedState::takeDamage(int dmg) {
 void DeadState::enter() { std::cout << "Enter Dead\n"; }
 void DeadState::exit() {}
 void DeadState::update() {}
-void DeadState::move(int dir) {
-  (void)dir;
-  std::cout << "Dead: cannot move\n";
-}
-void DeadState::attack() { std::cout << "Dead: cannot attack\n"; }
+
 void DeadState::takeDamage(int dmg) {
   (void)dmg;
   std::cout << "Dead: already dead\n";

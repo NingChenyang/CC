@@ -1,5 +1,0 @@
-/home/ning/CC/build/CMakeFiles/enemy_demo.dir
-/home/ning/CC/build/CMakeFiles/test_player_move.dir
-/home/ning/CC/build/CMakeFiles/interactive_test.dir
-/home/ning/CC/build/CMakeFiles/edit_cache.dir
-/home/ning/CC/build/CMakeFiles/rebuild_cache.dir

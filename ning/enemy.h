@@ -18,11 +18,9 @@ public:
     virtual void setEnemy(Enemy* e) { enemy_ = e; }
     virtual void enter() {}
     virtual void exit() {}
-    // dir 为 -1 表示左，+1 表示右
-    virtual void move(int dir) = 0;
-    virtual void attack() = 0;
     virtual void takeDamage(int dmg) = 0;
     virtual void update() = 0;
+    virtual std::string getName() const = 0;
     void checkStateTransition();
 };
 
@@ -75,6 +73,7 @@ public:
     void clearPlayer();
     // 状态管理
     void setState(State* s);
+    State* getCurrentState() const;
     State* getPatrolState() const;
     State* getChaseState() const;
     State* getAttackState() const;
@@ -90,9 +89,7 @@ public:
     int getAttackDmg() const;
     void setAttackDmg(int attackDmg);
     // 对外动作
-    // dir: -1 left, +1 right
-    void move(int dir);
-    void attack();
+
     void takeDamage(int dmg);
     void update();
 
@@ -107,6 +104,7 @@ public:
     int getPos() const;
     void setPos(int p);
     void setHP(int hp);
+    
     void setPatrolPoints(int a, int b);
     void setPatrolDir(int d);
     // 供状态访问的安全访问器

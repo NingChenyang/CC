@@ -6,8 +6,8 @@
 
 void printGameState(Player& player, Enemy& enemy) {
     std::cout << "\n=== 游戏状态 ===" << std::endl;
-    std::cout << "玩家位置: " << player.getPos() << ", 血量: " << player.getHp() << std::endl;
-    std::cout << "敌人位置: " << enemy.getPos() << ", 血量: " << enemy.getHP() << ", 韧性: " << enemy.getTenacity() << ", 护盾: " << enemy.getShield() << std::endl;
+    std::cout << "玩家位置: " << player.getPos() << ", 血量: " << player.getHp() <<", 状态: "<< player.getCurrentState()->getName() << std::endl;
+    std::cout << "敌人位置: " << enemy.getPos() << ", 血量: " << enemy.getHP() << ", 韧性: " << enemy.getTenacity() << ", 护盾: " << enemy.getShield() << ", 状态: "<< enemy.getCurrentState()->getName() << std::endl;
     std::cout << "距离: " << std::abs(player.getPos() - enemy.getPos()) << std::endl;
     std::cout << "==============" << std::endl;
 }
@@ -82,8 +82,9 @@ int main() {
                 }
                 
                 // 敌人执行动作（移动和状态转换）
+                enemy.getCurrentState()->checkStateTransition();
                 enemy.update();
-                
+                enemy.getCurrentState()->checkStateTransition();
                 // 玩家检查状态转换
                 player.getCurrentState()->update();
                 

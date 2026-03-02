@@ -20,6 +20,7 @@ public:
     virtual void update() = 0;
     // 状态转换辅助方法
     void checkStateTransition();
+    virtual std::string getName() const = 0;
 };
 
 // 前置声明具体状态类
@@ -36,6 +37,7 @@ public:
     void exit() override;
     void attack() override;
     void update() override;
+    std::string getName() const override { return "Idle"; }
 };
 
 // 交战状态：遇敌距离为1
@@ -46,6 +48,7 @@ public:
     void exit() override;
     void attack() override;
     void update() override;
+    std::string getName() const override { return "Engage"; }
 };
 
 // 警戒状态：遇敌距离为3
@@ -56,6 +59,7 @@ public:
     void exit() override;
     void attack() override;
     void update() override;
+    std::string getName() const override { return "Alert"; }
 };
 
 // 死亡状态
@@ -68,4 +72,5 @@ public:
     void attack() override;
     void takeDamage(int dmg) override;
     void update() override;
+    std::string getName() const override { return "Dead"; }
 };
