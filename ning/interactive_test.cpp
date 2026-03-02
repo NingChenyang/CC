@@ -35,7 +35,7 @@ int main() {
     map.setPlayer(&player);
     
     // 创建敌人
-    Enemy enemy(2, 2, 1, 55, 8,
+    Enemy enemy(2, 2, 1, 50, 8,
          5, 9, 10);
     enemy.setMap(&map);
     map.addEnemy(&enemy);

@@ -1,9 +1,22 @@
 #pragma once
-#include "enemy.h"
-#include "map.hpp"
+
+// #include "map.hpp"
 #include <string>
 class Enemy; // 提前声明
-
+class State {
+protected:
+    Enemy* enemy_;
+public:
+    State(Enemy* enemy = nullptr);
+    virtual ~State();
+    virtual void setEnemy(Enemy* e);
+    virtual void enter();
+    virtual void exit();
+    virtual void takeDamage(int dmg) = 0;
+    virtual void update() = 0;
+    virtual std::string getName() const = 0;
+    void checkStateTransition();
+};
 // 具体状态声明（在实现文件中定义行为）
 class PatrolState : public State {
 public:

@@ -1,6 +1,6 @@
 #include "enemy.h"
 #include "enemy_state.h"
-
+#include "map.hpp"
 // 构造函数
 Enemy::Enemy(int attackDmg, int zhuijiDis, int attackDis, int hp, int pos, int patrol_a, int patrol_b, int tenacity)
     : attackDmg_(attackDmg), zhuijiDis_(zhuijiDis), originalZhuijiDis_(zhuijiDis), attackDis_(attackDis), 

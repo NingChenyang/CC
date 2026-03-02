@@ -1,6 +1,6 @@
 #include "enemy_state.h"
 #include "enemy.h"
-
+#include "map.hpp"
 class Enemy;
 class Player;
 

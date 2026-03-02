@@ -3,27 +3,13 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-// #include "enemy_state.h"
-// 敌人状态与敌人类（1x10 线路）
-// 地图为 1 x 10 的线路，位置范围 [0,9]
+
+#include "enemy_state.h"
 
 class Enemy; // 提前声明
 class Map;
 class Player;
-class State {
-protected:
-    Enemy* enemy_;
-public:
-    State(Enemy* enemy = nullptr);
-    virtual ~State();
-    virtual void setEnemy(Enemy* e);
-    virtual void enter();
-    virtual void exit();
-    virtual void takeDamage(int dmg) = 0;
-    virtual void update() = 0;
-    virtual std::string getName() const = 0;
-    void checkStateTransition();
-};
+
 
 // 前置声明具体状态类
 class PatrolState;
