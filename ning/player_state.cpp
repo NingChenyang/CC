@@ -3,6 +3,7 @@
 #include "enemy.h"
 #include "map.hpp"
 #include <iostream>
+#include <string>
 
 
 
@@ -171,3 +172,21 @@ void PlayerDeadState::takeDamage(int dmg) {
 void PlayerDeadState::update() {
   // 死亡状态不需要更新
 }
+
+// 构造/析构/设置器（从头文件移出）
+PlayerState::PlayerState(Player* player) : player_(player) {}
+PlayerState::~PlayerState() {}
+void PlayerState::setPlayer(Player* p) { player_ = p; }
+
+// 各具体状态的构造与 getName 实现
+IdleState::IdleState(Player* player) : PlayerState(player) {}
+std::string IdleState::getName() const { return "Idle"; }
+
+EngageState::EngageState(Player* player) : PlayerState(player) {}
+std::string EngageState::getName() const { return "Engage"; }
+
+AlertState::AlertState(Player* player) : PlayerState(player) {}
+std::string AlertState::getName() const { return "Alert"; }
+
+PlayerDeadState::PlayerDeadState(Player* player) : PlayerState(player) {}
+std::string PlayerDeadState::getName() const { return "Dead"; }

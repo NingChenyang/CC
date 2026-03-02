@@ -35,7 +35,7 @@ int main() {
     map.setPlayer(&player);
     
     // 创建敌人
-    Enemy enemy(2, 2, 1, 50, 8,
+    Enemy enemy(2, 2, 1, 55, 8,
          5, 9, 10);
     enemy.setMap(&map);
     map.addEnemy(&enemy);
@@ -106,9 +106,11 @@ int main() {
                 break;
             case 'x':
                 std::cout << "\n=== 游戏退出 ===" << std::endl;
-                gameOver = true;
-                break;
-            default:
+                    std::cout << "玩家位置: " << player.getPos() << ", 血量: " << player.getHp()
+                              << "，状态: " << (player.getCurrentState() ? player.getCurrentState()->getName() : std::string("Unknown")) << std::endl;
+                    std::cout << "敌人位置: " << enemy.getPos() << ", 血量: " << enemy.getHP() << ", 韧性: " << enemy.getTenacity() << ", 护盾: " << enemy.getShield()
+                              << "，状态: " << (enemy.getCurrentState() ? enemy.getCurrentState()->getName() : std::string("Unknown")) << std::endl;
+                    std::cout << "距离: " << std::abs(player.getPos() - enemy.getPos()) << std::endl;
                 std::cout << "无效操作，请输入 h 查看帮助" << std::endl;
                 break;
         }

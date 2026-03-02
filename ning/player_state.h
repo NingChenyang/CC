@@ -1,6 +1,7 @@
 #pragma once
 // #include "Player.h"
 #include "enemy.h"
+#include <string>
 
 class Player;
 
@@ -9,9 +10,9 @@ class PlayerState {
 protected:
     Player* player_;
 public:
-    PlayerState(Player* player = nullptr) : player_(player) {}
-    virtual ~PlayerState() {}
-    virtual void setPlayer(Player* p) { player_ = p; }
+    PlayerState(Player* player = nullptr);
+    virtual ~PlayerState();
+    virtual void setPlayer(Player* p);
     virtual void enter()=0;
     virtual void exit()=0;
     virtual void move(int distance);
@@ -32,45 +33,45 @@ class PlayerDeadState;
 // 空闲状态：未遇敌
 class IdleState : public PlayerState {
 public:
-    IdleState(Player* player) : PlayerState(player) {}
+    IdleState(Player* player);
     void enter() override;
     void exit() override;
     void attack() override;
     void update() override;
-    std::string getName() const override { return "Idle"; }
+    std::string getName() const override;
 };
 
 // 交战状态：遇敌距离为1
 class EngageState : public PlayerState {
 public:
-    EngageState(Player* player) : PlayerState(player) {}
+    EngageState(Player* player);
     void enter() override;
     void exit() override;
     void attack() override;
     void update() override;
-    std::string getName() const override { return "Engage"; }
+    std::string getName() const override;
 };
 
 // 警戒状态：遇敌距离为3
 class AlertState : public PlayerState {
 public:
-    AlertState(Player* player) : PlayerState(player) {}
+    AlertState(Player* player);
     void enter() override;
     void exit() override;
     void attack() override;
     void update() override;
-    std::string getName() const override { return "Alert"; }
+    std::string getName() const override;
 };
 
 // 死亡状态
 class PlayerDeadState : public PlayerState {
 public:
-    PlayerDeadState(Player* player) : PlayerState(player) {}
+    PlayerDeadState(Player* player);
     void enter() override;
     void exit() override;
     void move(int distance) override;
     void attack() override;
     void takeDamage(int dmg) override;
     void update() override;
-    std::string getName() const override { return "Dead"; }
+    std::string getName() const override;
 };

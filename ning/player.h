@@ -24,32 +24,32 @@ public:
     void takeDamage(int dmg);
     void update(char moveCommand);
     // 对外查询
-    int getPos() const { return pos_; }
-    int getHp() const { return hp_; }
+    int getPos() const;
+    int getHp() const;
     // 设置方法
     void setPos(int pos);
     void setHp(int hp);
     void setEnemy(Enemy* enemy);
     Enemy* getEnemy() const;
-    void clearEnemy() { enemy_ = nullptr; }
+    void clearEnemy();
     // 距离阈值
-    int getEngageDistance() const { return engageDistance_; }
-    int getAlertDistance() const { return alertDistance_; }
-    int setEngageDistance(int dist) { engageDistance_ = dist; }
-    int setAlertDistance(int dist) { alertDistance_ = dist; }
+    int getEngageDistance() const;
+    int getAlertDistance() const;
+    int setEngageDistance(int dist);
+    int setAlertDistance(int dist);
 
     // 攻击伤害
-    int getAttackDamage() const { return attackDamage_; }
-    int setAttackDamage(int dmg) { attackDamage_ = dmg; }
+    int getAttackDamage() const;
+    int setAttackDamage(int dmg);
     // 地图
-    void setMap(Map *map) { map_ = map; }
-    Map *getMap() const { return map_; }
+    void setMap(Map *map);
+    Map *getMap() const;
 
 
 
     // 状态管理
     void setState(PlayerState* s);
-    PlayerState* getCurrentState() const { return current_; }
+    PlayerState* getCurrentState() const;
     PlayerState* getIdleState() const;
     PlayerState* getEngageState() const;
     PlayerState* getAlertState() const;

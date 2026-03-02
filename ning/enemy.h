@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <string>
 #include <vector>
 #include <algorithm>
 // #include "enemy_state.h"
@@ -13,11 +14,11 @@ class State {
 protected:
     Enemy* enemy_;
 public:
-    State(Enemy* enemy = nullptr) : enemy_(enemy) {}
-    virtual ~State() {}
-    virtual void setEnemy(Enemy* e) { enemy_ = e; }
-    virtual void enter() {}
-    virtual void exit() {}
+    State(Enemy* enemy = nullptr);
+    virtual ~State();
+    virtual void setEnemy(Enemy* e);
+    virtual void enter();
+    virtual void exit();
     virtual void takeDamage(int dmg) = 0;
     virtual void update() = 0;
     virtual std::string getName() const = 0;
@@ -117,13 +118,13 @@ public:
     void recoverTenacity();
     
     // 狂暴状态相关方法
-    bool isEnraged() const { return isEnraged_; }
-    bool hasBlinkStrike() const { return hasBlinkStrike_; }
-    void useBlinkStrike() { hasBlinkStrike_ = false; }
-    int getShield() const { return shield_; }
-    int getMaxHp() const { return maxHp_; }
+    bool isEnraged() const;
+    bool hasBlinkStrike() const;
+    void useBlinkStrike();
+    int getShield() const;
+    int getMaxHp() const;
     
     // 攻击计数器相关方法
-    void incrementAttackCount() { attackCount_++; }
-    int getAttackCount() const { return attackCount_; }
+    void incrementAttackCount();
+    int getAttackCount() const;
 };

@@ -2,6 +2,7 @@
 #include "player_state.h"
 #include "map.hpp"
 #include <iostream>
+#include <algorithm>
 
 // 构造函数
 Player::Player(int pos, int hp, int engageDistance, int alertDistance, int attackDamage) : pos_(pos), hp_(hp), engageDistance_(engageDistance), alertDistance_(alertDistance), attackDamage_(attackDamage), enemy_(nullptr) {
@@ -121,3 +122,18 @@ PlayerState* Player::getDeadState() const { return deadState_; }
 bool Player::isDead() const {
     return hp_ <= 0;
 }
+
+PlayerState* Player::getCurrentState() const { return current_; }
+
+// 简单访问器和设置器（从头文件移出）
+int Player::getPos() const { return pos_; }
+int Player::getHp() const { return hp_; }
+void Player::clearEnemy() { enemy_ = nullptr; }
+int Player::getEngageDistance() const { return engageDistance_; }
+int Player::getAlertDistance() const { return alertDistance_; }
+int Player::setEngageDistance(int dist) { engageDistance_ = dist; return engageDistance_; }
+int Player::setAlertDistance(int dist) { alertDistance_ = dist; return alertDistance_; }
+int Player::getAttackDamage() const { return attackDamage_; }
+int Player::setAttackDamage(int dmg) { attackDamage_ = dmg; return attackDamage_; }
+void Player::setMap(Map *map) { map_ = map; }
+Map *Player::getMap() const { return map_; }

@@ -168,3 +168,12 @@ void Enemy::recoverTenacity() {
     // changeTenacity(10); // 恢复 5 点韧性
     tenacity_ = 10;
 }
+
+// 简单访问器与计数器实现（从头文件移出）
+bool Enemy::isEnraged() const { return isEnraged_; }
+bool Enemy::hasBlinkStrike() const { return hasBlinkStrike_; }
+void Enemy::useBlinkStrike() { hasBlinkStrike_ = false; }
+int Enemy::getShield() const { return shield_; }
+int Enemy::getMaxHp() const { return maxHp_; }
+void Enemy::incrementAttackCount() { attackCount_++; }
+int Enemy::getAttackCount() const { return attackCount_; }

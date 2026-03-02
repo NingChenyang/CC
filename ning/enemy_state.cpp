@@ -394,3 +394,28 @@ void DeadState::takeDamage(int dmg) {
   (void)dmg;
   std::cout << "Dead: already dead\n";
 }
+// State 基类的构造/析构/简单方法实现（从头文件移出）
+State::State(Enemy* enemy) : enemy_(enemy) {}
+State::~State() {}
+void State::setEnemy(Enemy* e) { enemy_ = e; }
+void State::enter() {}
+void State::exit() {}
+
+// 各状态构造与 getName 的实现（从头文件移出）
+PatrolState::PatrolState(Enemy* enemy) : State(enemy) {}
+std::string PatrolState::getName() const { return "Patrol"; }
+
+ChaseState::ChaseState(Enemy* enemy) : State(enemy) {}
+std::string ChaseState::getName() const { return "Chase"; }
+
+AttackState::AttackState(Enemy* enemy) : State(enemy) {}
+std::string AttackState::getName() const { return "Attack"; }
+
+StunnedState::StunnedState(Enemy* enemy) : State(enemy), turns_(0) {}
+std::string StunnedState::getName() const { return "Stunned"; }
+
+int StunnedState::getTurns() const { return turns_; }
+void StunnedState::setTurns(int t) { turns_ = t; }
+
+DeadState::DeadState(Enemy* enemy) : State(enemy) {}
+std::string DeadState::getName() const { return "Dead"; }
