@@ -6,41 +6,42 @@ class Player;
 
 // 状态转换辅助方法
 void State::checkStateTransition() {
-    if (!enemy_) return;
-    
-    Map *map = enemy_->getMap();
-    Player *player = enemy_->getPlayer();
-    
-    // 如果没有玩家，切换到巡逻状态
+  if (!enemy_)
+    return;
+
+  Map *map = enemy_->getMap();
+  Player *player = enemy_->getPlayer();
+
+  // 如果没有玩家，切换到巡逻状态
+  if (!player) {
+    player = map->detectPlayer(enemy_->getPos(), enemy_->getZhuijiDis());
     if (!player) {
-        player = map->detectPlayer(enemy_->getPos(), enemy_->getZhuijiDis());
-        if (!player) {
-            // 已经在巡逻状态，不需要切换
-            return;
-        }
-        enemy_->setPlayer(player);
+      // 已经在巡逻状态，不需要切换
+      return;
     }
-    
-    int dist = std::abs(player->getPos() - enemy_->getPos());
-    
-    // 根据距离切换状态
-    if (dist > enemy_->getZhuijiDis()) {
-        std::cout << "Enemy: 目标丢失，切换到巡逻状态" << std::endl;
-        enemy_->clearPlayer();
-        enemy_->setState(enemy_->getPatrolState());
-    } else if (dist <= enemy_->getAttackDis()) {
-        // 如果不在攻击状态，切换到攻击状态
-        if (dynamic_cast<AttackState*>(this) == nullptr) {
-            std::cout << "Enemy: 目标在攻击范围内，切换到攻击状态" << std::endl;
-            enemy_->setState(enemy_->getAttackState());
-        }
-    } else {
-        // 如果不在追击状态，切换到追击状态
-        if (dynamic_cast<ChaseState*>(this) == nullptr) {
-            std::cout << "Enemy: 目标在追击范围，切换到追击状态" << std::endl;
-            enemy_->setState(enemy_->getChaseState());
-        }
+    enemy_->setPlayer(player);
+  }
+
+  int dist = std::abs(player->getPos() - enemy_->getPos());
+
+  // 根据距离切换状态
+  if (dist > enemy_->getZhuijiDis()) {
+    std::cout << "Enemy: 目标丢失，切换到巡逻状态" << std::endl;
+    enemy_->clearPlayer();
+    enemy_->setState(enemy_->getPatrolState());
+  } else if (dist <= enemy_->getAttackDis()) {
+    // 如果不在攻击状态，切换到攻击状态
+    if (dynamic_cast<AttackState *>(this) == nullptr) {
+      std::cout << "Enemy: 目标在攻击范围内，切换到攻击状态" << std::endl;
+      enemy_->setState(enemy_->getAttackState());
     }
+  } else {
+    // 如果不在追击状态，切换到追击状态
+    if (dynamic_cast<ChaseState *>(this) == nullptr) {
+      std::cout << "Enemy: 目标在追击范围，切换到追击状态" << std::endl;
+      enemy_->setState(enemy_->getChaseState());
+    }
+  }
 }
 void PatrolState::enter() { std::cout << "进入巡逻" << std::endl; }
 void PatrolState::exit() { std::cout << "退出巡逻" << std::endl; }
@@ -106,7 +107,35 @@ void ChaseState::update() {
     enemy_->setState(enemy_->getPatrolState());
     return;
   }
+  // 检查是否可以使用瞬砍技能
+  int dist = std::abs(player->getPos() - enemy_->getPos());
+  if (enemy_->isEnraged() && enemy_->hasBlinkStrike() && dist == 3) {
+    std::cout << "\n=== 敌人发动瞬砍技能！ ===" << std::endl;
+    std::cout << "敌人瞬间移动到玩家位置并发动攻击！" << std::endl;
 
+    // 移动到玩家位置
+    enemy_->setPos(player->getPos());
+    // 计算攻击力
+    int attackDmg = enemy_->getAttackDmg();
+    // 计算狂暴状态下的近战攻击力（近战攻击*狂暴buff2倍增伤）
+    attackDmg = static_cast<int>(attackDmg * 2 * 2); // 近战2倍 * 狂暴2倍
+    std::cout << "瞬砍攻击力: " << attackDmg << std::endl;
+
+    // 消耗瞬砍技能
+    enemy_->useBlinkStrike();
+    // 检查是否是第四下攻击（每攻击三下，第四下攻击*2）
+    enemy_->incrementAttackCount();
+    if (enemy_->getAttackCount() % 4 == 0) {
+      int originalDmg = attackDmg;
+      attackDmg = static_cast<int>(attackDmg * 2);
+      std::cout << "敌人发动强化攻击！攻击力提升至: " << attackDmg
+                << " (原本: " << originalDmg << ")" << std::endl;
+    }
+
+    std::cout << "攻击目标" << std::endl;
+    player->takeDamage(attackDmg);
+    return;
+  }
   // 向玩家移动一格
   int pos = enemy_->getPos();
   int target = player->getPos();
@@ -144,25 +173,25 @@ void AttackState::update() {
     enemy_->setState(enemy_->getPatrolState());
     return;
   }
-  
+
   // 检查是否可以使用瞬砍技能
   int dist = std::abs(player->getPos() - enemy_->getPos());
-  
+
   // 计算攻击力
   int attackDmg = enemy_->getAttackDmg();
-  
+
   // 检查是否触发瞬砍技能
   if (enemy_->isEnraged() && enemy_->hasBlinkStrike() && dist == 3) {
     std::cout << "\n=== 敌人发动瞬砍技能！ ===" << std::endl;
     std::cout << "敌人瞬间移动到玩家位置并发动攻击！" << std::endl;
-    
+
     // 移动到玩家位置
     enemy_->setPos(player->getPos());
-    
+
     // 计算狂暴状态下的近战攻击力（近战攻击*狂暴buff2倍增伤）
     attackDmg = static_cast<int>(attackDmg * 2 * 2); // 近战2倍 * 狂暴2倍
     std::cout << "瞬砍攻击力: " << attackDmg << std::endl;
-    
+
     // 消耗瞬砍技能
     enemy_->useBlinkStrike();
   } else if (dist == 0) {
@@ -170,7 +199,8 @@ void AttackState::update() {
     if (enemy_->isEnraged()) {
       // 狂暴状态下的近战攻击
       attackDmg = static_cast<int>(attackDmg * 2 * 2); // 近战2倍 * 狂暴2倍
-      std::cout << "敌人发动狂暴近战攻击！攻击力提升至: " << attackDmg << std::endl;
+      std::cout << "敌人发动狂暴近战攻击！攻击力提升至: " << attackDmg
+                << std::endl;
     } else {
       // 普通近战攻击
       attackDmg = static_cast<int>(attackDmg * 2);
@@ -181,15 +211,16 @@ void AttackState::update() {
     attackDmg = static_cast<int>(attackDmg * 2);
     std::cout << "敌人发动狂暴攻击！攻击力提升至: " << attackDmg << std::endl;
   }
-  
+
   // 检查是否是第四下攻击（每攻击三下，第四下攻击*2）
   enemy_->incrementAttackCount();
   if (enemy_->getAttackCount() % 4 == 0) {
     int originalDmg = attackDmg;
     attackDmg = static_cast<int>(attackDmg * 2);
-    std::cout << "敌人发动强化攻击！攻击力提升至: " << attackDmg << " (原本: " << originalDmg << ")" << std::endl;
+    std::cout << "敌人发动强化攻击！攻击力提升至: " << attackDmg
+              << " (原本: " << originalDmg << ")" << std::endl;
   }
-  
+
   std::cout << "攻击目标" << std::endl;
   player->takeDamage(attackDmg);
 
@@ -220,17 +251,18 @@ void StunnedState::exit() { std::cout << "Exit Stunned\n"; }
 void StunnedState::update() {
   if (!enemy_)
     return;
-  
+
   // 检查是否血量小于等于10%，如果是，直接苏醒进入狂暴状态
   int maxHp = enemy_->getMaxHp();
   int currentHp = enemy_->getHP();
   if (currentHp <= maxHp * 0.1) {
-    std::cout << "\n=== 敌人血量过低，强制苏醒并进入狂暴状态！ ===" << std::endl;
+    std::cout << "\n=== 敌人血量过低，强制苏醒并进入狂暴状态！ ==="
+              << std::endl;
     enemy_->recoverTenacity(); // 恢复韧性
-    
+
     // 触发狂暴状态
     enemy_->setHP(currentHp); // 重新设置血量，触发狂暴状态
-    
+
     Player *player = enemy_->getPlayer();
     if (!player) {
       std::cout << "目标丢失，继续巡逻" << std::endl;
@@ -238,12 +270,12 @@ void StunnedState::update() {
       enemy_->setState(enemy_->getPatrolState());
       return;
     }
-    
+
     // 检查状态转换
     checkStateTransition();
     return;
   }
-  
+
   turns_++;
   std::cout << "Stunned: recovering... (turn " << turns_ << "/2)\n";
 

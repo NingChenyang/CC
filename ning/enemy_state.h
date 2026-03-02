@@ -2,6 +2,7 @@
 #include "enemy.h"
 #include "map.hpp"
 class Enemy; // 提前声明
+
 // 具体状态声明（在实现文件中定义行为）
 class PatrolState : public State {
 public:

@@ -101,9 +101,6 @@ void Enemy::takeDamage(int dmg) {
         current_->takeDamage(remainingDamage);
     }
     
-    if (hp_ <= 0) {
-        setState(deadState_);
-    }
 }
 
 void Enemy::update() {
